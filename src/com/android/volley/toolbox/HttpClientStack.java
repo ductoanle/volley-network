@@ -16,6 +16,7 @@
 
 package com.android.volley.toolbox;
 
+import android.text.TextUtils;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Request.Method;
@@ -36,7 +37,11 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,6 +52,7 @@ public class HttpClientStack implements HttpStack {
     protected final HttpClient mClient;
 
     private final static String HEADER_CONTENT_TYPE = "Content-Type";
+    private static final String UTF8_CHARSET = "UTF-8";
 
     public HttpClientStack(HttpClient client) {
         mClient = client;
@@ -88,7 +94,28 @@ public class HttpClientStack implements HttpStack {
      */
     @SuppressWarnings("deprecation")
     /* protected */ static HttpUriRequest createHttpRequest(Request<?> request,
-            Map<String, String> additionalHeaders) throws AuthFailureError {
+            Map<String, String> additionalHeaders) throws AuthFailureError, UnsupportedEncodingException {
+
+        HashMap<String, String> parameterMap = new HashMap<String, String>();
+        StringBuilder paramBuilder = new StringBuilder();
+        if (parameterMap != null && !parameterMap.isEmpty()) {
+            int count = 0;
+            for (Map.Entry<String, String> parameter : parameterMap.entrySet()) {
+                String key = parameter.getKey();
+                String value = parameter.getValue();
+                if (value == null){
+                    value = "null";
+                }
+                paramBuilder.append(URLEncoder.encode(key, UTF8_CHARSET));
+                paramBuilder.append("=");
+                paramBuilder.append(URLEncoder.encode(value, UTF8_CHARSET));
+                if (count < parameterMap.size() - 1){
+                    paramBuilder.append("&");
+                }
+                count++;
+            }
+        }
+
         switch (request.getMethod()) {
             case Method.DEPRECATED_GET_OR_POST: {
                 // This is the deprecated way that needs to be handled for backwards compatibility.
@@ -107,7 +134,15 @@ public class HttpClientStack implements HttpStack {
                 }
             }
             case Method.GET:
-                return new HttpGet(request.getUrl());
+                String url = request.getUrl();
+                if (!TextUtils.isEmpty(paramBuilder.toString())){
+                    url = url + "?" + paramBuilder.toString();
+                }
+                HttpGet getRequest = new HttpGet(url);
+                for (Map.Entry<String, String> entry : request.getHeaders().entrySet()){
+                    getRequest.addHeader(entry.getKey(), entry.getValue());
+                }
+                return getRequest;
             case Method.DELETE:
                 return new HttpDelete(request.getUrl());
             case Method.POST: {

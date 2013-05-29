@@ -26,6 +26,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
 
 /**
  * A request for retrieving a {@link JSONArray} response body at a given URL.
@@ -40,6 +41,29 @@ public class JsonArrayRequest extends JsonRequest<JSONArray> {
      */
     public JsonArrayRequest(String url, Listener<JSONArray> listener, ErrorListener errorListener) {
         super(Method.GET, url, null, listener, errorListener);
+    }
+
+    /**
+     * Creates a new request.
+     * @param url URL to fetch the JSON from
+     * @param headers Headers of the request
+     * @param listener Listener to receive the JSON response
+     * @param errorListener Error listener, or null to ignore errors.
+     */
+    public JsonArrayRequest(String url, Map<String, String> headers, Listener<JSONArray> listener, ErrorListener errorListener) {
+        super(Method.GET, url, null, headers, listener, errorListener);
+    }
+
+    /**
+     * Creates a new request.
+     * @param url URL to fetch the JSON from
+     * @param headers Headers of the request
+     * @param parmas Parameters of the request
+     * @param listener Listener to receive the JSON response
+     * @param errorListener Error listener, or null to ignore errors.
+     */
+    public JsonArrayRequest(String url, Map<String, String> headers, Map<String, String> params, Listener<JSONArray> listener, ErrorListener errorListener) {
+        super(Method.GET, url, null, headers, params, listener, errorListener);
     }
 
     @Override

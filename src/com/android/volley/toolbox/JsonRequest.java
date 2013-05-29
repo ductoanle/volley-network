@@ -24,6 +24,8 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyLog;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A request for retrieving a T type response body at a given URL that also
@@ -40,6 +42,8 @@ public abstract class JsonRequest<T> extends Request<T> {
         String.format("application/json; charset=%s", PROTOCOL_CHARSET);
 
     private final Listener<T> mListener;
+    private Map<String, String> mHeaders = new HashMap<String, String>();
+    private Map<String, String> mParams = new HashMap<String, String>();
     private final String mRequestBody;
 
     /**
@@ -58,6 +62,28 @@ public abstract class JsonRequest<T> extends Request<T> {
         super(method, url, errorListener);
         mListener = listener;
         mRequestBody = requestBody;
+    }
+
+    public JsonRequest(int method, String url, String requestBody, Map<String, String> headers,
+                       Listener<T> listener, ErrorListener errorListener){
+        this(method, url, requestBody, listener, errorListener);
+        this.mHeaders = headers;
+    }
+
+    public JsonRequest(int method, String url, String requestBody, Map<String, String> headers, Map<String, String> params,
+                       Listener<T> listener, ErrorListener errorListener){
+        this(method, url, requestBody, headers, listener, errorListener);
+        mParams = params;
+    }
+
+    @Override
+    public Map<String, String> getParams(){
+        return mParams;
+    }
+
+    @Override
+    public Map<String, String> getHeaders(){
+        return mHeaders;
     }
 
     @Override

@@ -26,6 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
 
 /**
  * A request for retrieving a {@link JSONObject} response body at a given URL, allowing for an
@@ -46,6 +47,39 @@ public class JsonObjectRequest extends JsonRequest<JSONObject> {
             Listener<JSONObject> listener, ErrorListener errorListener) {
         super(method, url, (jsonRequest == null) ? null : jsonRequest.toString(), listener,
                     errorListener);
+    }
+
+    /**
+     * Creates a new request.
+     * @param method the HTTP method to use
+     * @param url URL to fetch the JSON from
+     * @param headers the headers of the request
+     * @param jsonRequest A {@link JSONObject} to post with the request. Null is allowed and
+     *   indicates no parameters will be posted along with request.
+     * @param listener Listener to receive the JSON response
+     * @param errorListener Error listener, or null to ignore errors.
+     */
+    public JsonObjectRequest(int method, String url, Map<String, String> headers, JSONObject jsonRequest,
+                             Listener<JSONObject> listener, ErrorListener errorListener) {
+        super(method, url, (jsonRequest == null) ? null : jsonRequest.toString(), headers, listener,
+                errorListener);
+    }
+
+    /**
+     * Creates a new request.
+     * @param method the HTTP method to use
+     * @param url URL to fetch the JSON from
+     * @param headers the headers of the request
+     * @param params the params of the request
+     * @param jsonRequest A {@link JSONObject} to post with the request. Null is allowed and
+     *   indicates no parameters will be posted along with request.
+     * @param listener Listener to receive the JSON response
+     * @param errorListener Error listener, or null to ignore errors.
+     */
+    public JsonObjectRequest(int method, String url, Map<String, String> headers, Map<String, String> params,
+                             JSONObject jsonRequest, Listener<JSONObject> listener, ErrorListener errorListener) {
+        super(method, url, (jsonRequest == null) ? null : jsonRequest.toString(), headers, params, listener,
+                errorListener);
     }
 
     /**

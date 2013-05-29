@@ -23,12 +23,15 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
 
 /**
  * A canned request for retrieving the response body at a given URL as a String.
  */
 public class StringRequest extends Request<String> {
     private final Listener<String> mListener;
+    private Map<String, String> mHeaders;
+    private Map<String, String> mParameters;
 
     /**
      * Creates a new request with the given method.
@@ -39,7 +42,22 @@ public class StringRequest extends Request<String> {
      * @param errorListener Error listener, or null to ignore errors
      */
     public StringRequest(int method, String url, Listener<String> listener,
-            ErrorListener errorListener) {
+                         ErrorListener errorListener) {
+        super(method, url, errorListener);
+        mListener = listener;
+    }
+
+    /**
+     * Creates a new request with the given method.
+     *
+     * @param method the request {@link Method} to use
+     * @param headers headers of the request
+     * @param url URL to fetch the string at
+     * @param listener Listener to receive the String response
+     * @param errorListener Error listener, or null to ignore errors
+     */
+    public StringRequest(int method, String url, Map<String, String> headers, Listener<String> listener,
+                         ErrorListener errorListener) {
         super(method, url, errorListener);
         mListener = listener;
     }
@@ -49,10 +67,14 @@ public class StringRequest extends Request<String> {
      *
      * @param url URL to fetch the string at
      * @param listener Listener to receive the String response
+     * @param headers Headers of the request
+     * @param params Parameters of the request
      * @param errorListener Error listener, or null to ignore errors
      */
-    public StringRequest(String url, Listener<String> listener, ErrorListener errorListener) {
+    public StringRequest(String url, Listener<String> listener, Map<String, String> headers, Map<String, String> params, ErrorListener errorListener) {
         this(Method.GET, url, listener, errorListener);
+        mHeaders = headers;
+        mParameters = params;
     }
 
     @Override

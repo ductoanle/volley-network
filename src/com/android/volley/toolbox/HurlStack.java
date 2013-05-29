@@ -16,6 +16,7 @@
 
 package com.android.volley.toolbox;
 
+import android.text.TextUtils;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Request.Method;
@@ -35,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +51,7 @@ import javax.net.ssl.SSLSocketFactory;
 public class HurlStack implements HttpStack {
 
     private static final String HEADER_CONTENT_TYPE = "Content-Type";
+    private static final String UTF8_CHARSET = "UTF-8";
 
     /**
      * An interface for transforming URLs before use.
@@ -87,7 +90,28 @@ public class HurlStack implements HttpStack {
     @Override
     public HttpResponse performRequest(Request<?> request, Map<String, String> additionalHeaders)
             throws IOException, AuthFailureError {
+        StringBuilder paramBuilder = new StringBuilder();
+        if (request.getParams() != null && !request.getParams().isEmpty()) {
+            int count = 0;
+            for (Map.Entry<String, String> parameter : request.getParams().entrySet()) {
+                String key = parameter.getKey();
+                String value = parameter.getValue();
+                if (value == null){
+                    value = "null";
+                }
+                paramBuilder.append(URLEncoder.encode(key, UTF8_CHARSET));
+                paramBuilder.append("=");
+                paramBuilder.append(URLEncoder.encode(value, UTF8_CHARSET));
+                if (count < request.getParams().size() - 1){
+                    paramBuilder.append("&");
+                }
+                count++;
+            }
+        }
         String url = request.getUrl();
+        if (!TextUtils.isEmpty(paramBuilder.toString())){
+            url = url + "?" + paramBuilder.toString();
+        }
         HashMap<String, String> map = new HashMap<String, String>();
         map.putAll(request.getHeaders());
         map.putAll(additionalHeaders);
