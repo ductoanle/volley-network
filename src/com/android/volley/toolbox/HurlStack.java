@@ -87,34 +87,52 @@ public class HurlStack implements HttpStack {
         mSslSocketFactory = sslSocketFactory;
     }
 
+    private String getUrlBaseOnMethod(Request<?> request) throws AuthFailureError, IOException{
+        String url = request.getUrl();
+        switch (request.getMethod()) {
+            case Method.DEPRECATED_GET_OR_POST:
+            case Method.GET:
+            case Method.DELETE:
+            case Method.PUT:
+                StringBuilder paramBuilder = new StringBuilder();
+                if (request.getParams() != null && !request.getParams().isEmpty()) {
+                    int count = 0;
+                    for (Map.Entry<String, String> parameter : request.getParams().entrySet()) {
+                        String key = parameter.getKey();
+                        String value = parameter.getValue();
+                        if (value == null){
+                            value = "null";
+                        }
+                        paramBuilder.append(URLEncoder.encode(key, UTF8_CHARSET));
+                        paramBuilder.append("=");
+                        paramBuilder.append(URLEncoder.encode(value, UTF8_CHARSET));
+                        if (count < request.getParams().size() - 1){
+                            paramBuilder.append("&");
+                        }
+                        count++;
+                    }
+                }
+                if (!TextUtils.isEmpty(paramBuilder.toString())){
+                    if (!url.contains("?")){
+                        url = url + "?" + paramBuilder.toString();
+                    }
+                    else{
+                        url = url + "&" + paramBuilder.toString();
+                    }
+                }
+        }
+        return url;
+    }
+
+
     @Override
     public HttpResponse performRequest(Request<?> request, Map<String, String> additionalHeaders)
             throws IOException, AuthFailureError {
-        StringBuilder paramBuilder = new StringBuilder();
-        if (request.getParams() != null && !request.getParams().isEmpty()) {
-            int count = 0;
-            for (Map.Entry<String, String> parameter : request.getParams().entrySet()) {
-                String key = parameter.getKey();
-                String value = parameter.getValue();
-                if (value == null){
-                    value = "null";
-                }
-                paramBuilder.append(URLEncoder.encode(key, UTF8_CHARSET));
-                paramBuilder.append("=");
-                paramBuilder.append(URLEncoder.encode(value, UTF8_CHARSET));
-                if (count < request.getParams().size() - 1){
-                    paramBuilder.append("&");
-                }
-                count++;
-            }
-        }
-        String url = request.getUrl();
-        if (!TextUtils.isEmpty(paramBuilder.toString())){
-            url = url + "?" + paramBuilder.toString();
-        }
+        String url = getUrlBaseOnMethod(request);
         HashMap<String, String> map = new HashMap<String, String>();
         map.putAll(request.getHeaders());
         map.putAll(additionalHeaders);
+
         if (mUrlRewriter != null) {
             String rewritten = mUrlRewriter.rewriteUrl(url);
             if (rewritten == null) {
@@ -195,6 +213,7 @@ public class HurlStack implements HttpStack {
     @SuppressWarnings("deprecation")
     /* package */ static void setConnectionParametersForRequest(HttpURLConnection connection,
             Request<?> request) throws IOException, AuthFailureError {
+
         switch (request.getMethod()) {
             case Method.DEPRECATED_GET_OR_POST:
                 // This is the deprecated way that needs to be handled for backwards compatibility.

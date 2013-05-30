@@ -95,25 +95,33 @@ public class HttpClientStack implements HttpStack {
     @SuppressWarnings("deprecation")
     /* protected */ static HttpUriRequest createHttpRequest(Request<?> request,
             Map<String, String> additionalHeaders) throws AuthFailureError, UnsupportedEncodingException {
-
-        HashMap<String, String> parameterMap = new HashMap<String, String>();
-        StringBuilder paramBuilder = new StringBuilder();
-        if (parameterMap != null && !parameterMap.isEmpty()) {
-            int count = 0;
-            for (Map.Entry<String, String> parameter : parameterMap.entrySet()) {
-                String key = parameter.getKey();
-                String value = parameter.getValue();
-                if (value == null){
-                    value = "null";
+        String url = request.getUrl();
+        switch(request.getMethod()){
+            case Method.GET:
+            case Method.PUT:
+            case Method.DELETE:
+                HashMap<String, String> parameterMap = new HashMap<String, String>();
+                StringBuilder paramBuilder = new StringBuilder();
+                if (parameterMap != null && !parameterMap.isEmpty()) {
+                    int count = 0;
+                    for (Map.Entry<String, String> parameter : parameterMap.entrySet()) {
+                        String key = parameter.getKey();
+                        String value = parameter.getValue();
+                        if (value == null){
+                            value = "null";
+                        }
+                        paramBuilder.append(URLEncoder.encode(key, UTF8_CHARSET));
+                        paramBuilder.append("=");
+                        paramBuilder.append(URLEncoder.encode(value, UTF8_CHARSET));
+                        if (count < parameterMap.size() - 1){
+                            paramBuilder.append("&");
+                        }
+                        count++;
+                    }
                 }
-                paramBuilder.append(URLEncoder.encode(key, UTF8_CHARSET));
-                paramBuilder.append("=");
-                paramBuilder.append(URLEncoder.encode(value, UTF8_CHARSET));
-                if (count < parameterMap.size() - 1){
-                    paramBuilder.append("&");
+                if (!TextUtils.isEmpty(paramBuilder.toString())){
+                    url = url + "?" + paramBuilder.toString();
                 }
-                count++;
-            }
         }
 
         switch (request.getMethod()) {
@@ -134,17 +142,11 @@ public class HttpClientStack implements HttpStack {
                 }
             }
             case Method.GET:
-                String url = request.getUrl();
-                if (!TextUtils.isEmpty(paramBuilder.toString())){
-                    url = url + "?" + paramBuilder.toString();
-                }
                 HttpGet getRequest = new HttpGet(url);
-                for (Map.Entry<String, String> entry : request.getHeaders().entrySet()){
-                    getRequest.addHeader(entry.getKey(), entry.getValue());
-                }
                 return getRequest;
             case Method.DELETE:
-                return new HttpDelete(request.getUrl());
+                HttpDelete deleteRequest = new HttpDelete(url);
+                return deleteRequest;
             case Method.POST: {
                 HttpPost postRequest = new HttpPost(request.getUrl());
                 postRequest.addHeader(HEADER_CONTENT_TYPE, request.getBodyContentType());
@@ -152,7 +154,7 @@ public class HttpClientStack implements HttpStack {
                 return postRequest;
             }
             case Method.PUT: {
-                HttpPut putRequest = new HttpPut(request.getUrl());
+                HttpPut putRequest = new HttpPut(url);
                 putRequest.addHeader(HEADER_CONTENT_TYPE, request.getBodyContentType());
                 setEntityIfNonEmptyBody(putRequest, request);
                 return putRequest;
