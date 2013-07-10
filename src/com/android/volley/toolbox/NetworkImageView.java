@@ -20,6 +20,7 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
+import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.ImageLoader.ImageContainer;
 
 /**
@@ -27,6 +28,9 @@ import com.android.volley.toolbox.ImageLoader.ImageContainer;
  * associated request.
  */
 public class NetworkImageView extends ImageView {
+
+    private static final String TAG = "NetworkImageView";
+
     /** The URL of the network image to load */
     private String mUrl;
 
@@ -113,6 +117,7 @@ public class NetworkImageView extends ImageView {
                 mImageContainer = null;
             }
             setImageBitmap(null);
+            VolleyLog.d(TAG, "Not loading image");
             return;
         }
 
@@ -130,6 +135,7 @@ public class NetworkImageView extends ImageView {
 
         // The pre-existing content of this view didn't match the current URL. Load the new image
         // from the network.
+        VolleyLog.d(TAG, "Start loading image");
         ImageContainer newContainer = mImageLoader.get(mUrl,
                 ImageLoader.getImageListener(this, mDefaultImageId, mErrorImageId));
 

@@ -22,6 +22,7 @@ import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 
+import com.android.volley.VolleyLog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -80,6 +81,17 @@ public class JsonObjectRequest extends JsonRequest<JSONObject> {
                              JSONObject jsonRequest, Listener<JSONObject> listener, ErrorListener errorListener) {
         super(method, url, (jsonRequest == null) ? null : jsonRequest.toString(), headers, params, listener,
                 errorListener);
+
+        String paramsString = "";
+        String headersString = "";
+        for (Map.Entry<String, String> entry: params.entrySet()){
+            paramsString += entry.getKey() + ":" + entry.getValue() + "\n";
+        }
+        for (Map.Entry<String, String> entry: headers.entrySet()){
+            headersString += entry.getKey() + ":" + entry.getValue() + "\n";
+        }
+
+        VolleyLog.d("Request String : URL: " + url + "\nHeaders: " + headersString + "\nParams: " + paramsString);
     }
 
     /**
