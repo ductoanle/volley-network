@@ -116,6 +116,17 @@ public class StringRequest extends Request<String> {
         return mHeaders;
     }
 
+    public String getCacheKey() {
+        String cacheKey = getUrl();
+        for (Map.Entry<String, String> entry: mHeaders.entrySet()){
+            cacheKey += entry.getKey() + entry.getValue();
+        }
+        for (Map.Entry<String, String> entry: mHeaders.entrySet()){
+            cacheKey += entry.getKey() + entry.getValue();
+        }
+        return cacheKey;
+    }
+
     /**
      * @deprecated Use {@link #getBodyContentType()}.
      */
