@@ -83,11 +83,11 @@ public class StringRequest extends Request<String> {
      * @param params Parameters of the request
      * @param errorListener Error listener, or null to ignore errors
      */
-    public StringRequest(int method, String url, Map<String, String> headers, Map<String, String> params, JSONObject requestBody, Listener<String> listener, ErrorListener errorListener) {
+    public StringRequest(int method, String url, Map<String, String> headers, Map<String, String> params, String requestBody, Listener<String> listener, ErrorListener errorListener) {
         this(method, url, listener, errorListener);
         mHeaders = headers;
         mParams = params;
-        mRequestBody = (requestBody == null) ? null : requestBody.toString();
+        mRequestBody = (requestBody == null) ? null : requestBody;
 
         String paramsString = "";
         String headersString = "";
