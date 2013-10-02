@@ -41,8 +41,17 @@ public class VolleyError extends Exception {
         networkResponse = null;
     }
 
+    public VolleyError(String exceptionMessage, NetworkResponse response)
+    {
+    	super(exceptionMessage);
+    	networkResponse = response;
+    }
     public VolleyError(Throwable cause) {
         super(cause);
         networkResponse = null;
+    }
+    
+    public NetworkResponse getNetworkResponse() {
+    	return networkResponse;
     }
 }
