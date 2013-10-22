@@ -119,12 +119,12 @@ public class StringRequest extends Request<String> {
 
     public String getCacheKey() {
         String cacheKey = getUrl();
-        for (Map.Entry<String, String> entry: mHeaders.entrySet()){
+        for (Map.Entry<String, String> entry: mParams.entrySet()){
             cacheKey += entry.getKey() + entry.getValue();
         }
-        for (Map.Entry<String, String> entry: mHeaders.entrySet()){
-            cacheKey += entry.getKey() + entry.getValue();
-        }
+//        for (Map.Entry<String, String> entry: mHeaders.entrySet()){
+//            cacheKey += entry.getKey() + entry.getValue();
+//        }
         return cacheKey;
     }
 
