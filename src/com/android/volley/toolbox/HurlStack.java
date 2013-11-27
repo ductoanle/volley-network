@@ -20,6 +20,7 @@ import android.text.TextUtils;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Request.Method;
+import com.android.volley.VolleyLog;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -89,8 +90,10 @@ public class HurlStack implements HttpStack {
 
     private String getUrlBaseOnMethod(Request<?> request) throws AuthFailureError, IOException{
         String url = request.getUrl();
+        VolleyLog.d("HurlStack", "Method is " + request.getMethod());
         switch (request.getMethod()) {
             case Method.DEPRECATED_GET_OR_POST:
+            case Method.POST:
             case Method.GET:
             case Method.DELETE:
             case Method.PUT:
@@ -213,7 +216,7 @@ public class HurlStack implements HttpStack {
     @SuppressWarnings("deprecation")
     /* package */ static void setConnectionParametersForRequest(HttpURLConnection connection,
             Request<?> request) throws IOException, AuthFailureError {
-
+        VolleyLog.d("HurlStack", "Method is " + request.getMethod());
         switch (request.getMethod()) {
             case Method.DEPRECATED_GET_OR_POST:
                 // This is the deprecated way that needs to be handled for backwards compatibility.
