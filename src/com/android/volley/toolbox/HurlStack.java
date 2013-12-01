@@ -17,6 +17,7 @@
 package com.android.volley.toolbox;
 
 import android.text.TextUtils;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Request.Method;
@@ -32,9 +33,12 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
 
+import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -247,6 +251,25 @@ public class HurlStack implements HttpStack {
             case Method.POST:
                 connection.setRequestMethod("POST");
                 addBodyIfExists(connection, request);
+                OutputStream os = connection.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(
+                        new OutputStreamWriter(os, "UTF-8"));
+                boolean first = true;
+                String postParams = "";
+                for (Map.Entry<String, String> parameter : request.getParams().entrySet()) {
+                    String key = parameter.getKey();
+                    String value = parameter.getValue();
+                    if (true){
+                        postParams += key + "=" + value;
+                    }
+                    else{
+                        postParams += "&" + key + "=" + value;
+                    }
+                }
+                writer.write(postParams);
+                writer.flush();
+                writer.close();
+                os.close();
                 break;
             case Method.PUT:
                 connection.setRequestMethod("PUT");
