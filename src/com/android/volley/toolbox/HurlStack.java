@@ -259,8 +259,9 @@ public class HurlStack implements HttpStack {
                 for (Map.Entry<String, String> parameter : request.getParams().entrySet()) {
                     String key = parameter.getKey();
                     String value = parameter.getValue();
-                    if (true){
+                    if (first){
                         postParams += key + "=" + value;
+                        first = false;
                     }
                     else{
                         postParams += "&" + key + "=" + value;
